@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import { render } from "react-dom";
 
 import Loading from "./Loading";
@@ -9,40 +9,32 @@ import "./styles.scss";
 
 const endpoint = "https://star-wars-characters.glitch.me/api/characters";
 
-class Application extends Component {
-  state = {
-    characters: [],
-    loading: true
-  };
+const Application = () => {
+  const [characters, setCharacters] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  componentDidMount() {
+  useEffect(() => {
     fetch(endpoint)
       .then(response => response.json())
       .then(response => {
-        this.setState({
-          characters: response.results,
-          loading: false
-        });
+        setCharacters(response.results);
+        setLoading(false);
       })
       .catch(console.error);
-  }
+  }, []);
 
-  render() {
-    const { characters, loading } = this.state;
+  if (loading) return <Loading />;
 
-    if (loading) return <Loading />;
-
-    return (
-      <table className="characters">
-        <TableHeading />
-        <tbody>
-          {characters.map(character => (
-            <Character character={character} key={character.id} />
-          ))}
-        </tbody>
-      </table>
-    );
-  }
-}
+  return (
+    <table className="characters">
+      <TableHeading />
+      <tbody>
+        {characters.map(character => (
+          <Character character={character} key={character.id} />
+        ))}
+      </tbody>
+    </table>
+  );
+};
 
 render(<Application />, document.getElementById("root"));
